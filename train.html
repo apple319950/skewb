@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Skewb Trainer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- 左側設定 -->
+    <div class="panel">
+      <h1>Skewb Trainer</h1>
+      <h2>選擇分類</h2>
+
+      <div class="checkbox-group category-grid">
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="2step">
+          2-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="3step">
+          3-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="4step">
+          4-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="5step">
+          5-step
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom1">
+          自訂題組1
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom2">
+          自訂題組2
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom3">
+          自訂題組3
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom4">
+          自訂題組4
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom5">
+          自訂題組5
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom6">
+          自訂題組6
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom7">
+          自訂題組7
+        </label>
+
+      </div>
+
+      <h2>練習模式</h2>
+      
+
+      <div class="checkbox-group">
+        <label class="check-row">
+          <input type="radio" name="practiceMode" value="random" checked>
+          隨機練習
+        </label>
+
+        <label class="check-row">
+          <input type="radio" name="practiceMode" value="sequential">
+          逐一練習（不重複）
+        </label>
+      </div>
+
+      <h2>複習模式</h2>
+
+      <div class="checkbox-group">
+        <label class="check-row">
+          <input type="checkbox" id="starredOnlyCheck">
+          只練星星題
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="excludeStarredCheck">
+          排除星星題
+        </label>
+      </div>
+
+      <button id="clearButton" class="danger">清除紀錄</button>
+      <button id="clearStarsButton" class="danger">清除星星</button>
+      <button id="reloadButton">重新載入題庫</button>
+      <button id="nextButton">下一題</button>
+      <button id="resetButton" class="secondary">重置時間</button>
+      
+
+      <div class="status">
+        狀態：<b id="timerStateText">尚未開始</b><br>
+        已讀取：<b id="caseCount">0</b> 題<br>
+        已選分類：<b id="selectedDepthText">-</b><br>
+        目前題號：<b id="currentIndexText">-</b>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="num" id="solveCount">0</div>
+          <div class="label">完成數</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="bestTime">-</div>
+          <div class="label">Best</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="avgTime">-</div>
+          <div class="label">Average</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="lastTime">-</div>
+          <div class="label">Last</div>
+        </div>
+      </div>
+
+      <p class="small">
+        <br><br>
+        作者：楊謙君 & ChatGPT5.5 Thinking
+        與我聯絡：
+        319950apple@gmail.com
+        
+      </p>
+    </div>
+
+    <!-- 中間訓練區 -->
+    <div class="panel center-panel">
+
+
+      <div class="scramble" id="scrambleText">
+        尚未載入 scramble
+      </div>
+
+      <div class="timer stopped" id="timerDisplay">0.00</div>
+
+      <div class="shortcut">
+        空白鍵：開始\暫停<br>
+        N：下一題　R：重置
+      </div>
+
+      <div class="case-image-box">
+        <span class="no-image" id="noImageText">尚未載入圖片</span>
+        <canvas id="caseCanvas"></canvas>
+      </div>
+      
+      <div class="case-title" id="caseTitle">正在載入題庫...</div>
+
+    </div>
+
+    <!-- 右側上一題與紀錄 -->
+    <div class="panel">
+
+      <div class="prev-box">
+        <div class="prev-title">上一題&複習標記</div>
+        <button id="starButton" class="star-button" disabled>
+          ☆ 加入星星複習
+        </button>
+        <div class="middle" id="prevCase">-</div>
+        <canvas id="prevCanvas" class="prev-canvas"></canvas>
+      </div>
+
+      <div class="prev-row">
+        <div class="prev-box">
+          <div class="prev-title">Scramble</div>
+          <div id="prevScramble" class="mono">-</div>
+          <div class="prev-title">Solution</div>
+          <div id="prevSolution" class="mono">-</div>
+        </div>
+
+        <div class="prev-box">
+          <div class="prev-title">時間</div>
+          <div id="prevTime">-</div>
+        </div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">分類</div>
+        <div id="prevDepth">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">Note</div>
+        <div id="prevNote">-</div>
+      </div>
+
+      <h1>紀錄</h1>
+
+      <div class="records">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Time</th>
+              <th>Step</th>
+              <th>Case</th>
+            </tr>
+          </thead>
+          <tbody id="recordBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
