@@ -490,8 +490,8 @@ function nextCase() {
   currentIndexText.textContent = currentIndex + 1;
 
   caseTitle.textContent = `${formatCategoryLabel(currentCase)}｜${currentCase.name}`;
-  scrambleText.textContent = currentCase.scramble || "-";
-  //scrambleText.textContent = algToChinese(currentCase.scramble || "-");
+  //scrambleText.textContent = currentCase.scramble || "-";
+  scrambleText.textContent = algToChinese(currentCase.scramble || "-");
 
   showCurrentSkewb(currentCase.colors);
 }
@@ -614,10 +614,10 @@ function updatePrevious(record) {
   prevTime.textContent = record.timeText;
   prevDepth.textContent = formatCategoryLabel(record);
   prevCase.textContent = record.caseName || "-";
-  prevScramble.textContent = record.scramble || "-";
-  prevSolution.textContent = record.solution || "-";
-  //prevScramble.textContent = algToChinese(record.scramble || "-");
-  //prevSolution.textContent = algToChinese(record.solution || "-");
+  //prevScramble.textContent = record.scramble || "-";
+  //prevSolution.textContent = record.solution || "-";
+  prevScramble.textContent = algToChinese(record.scramble || "-");
+  prevSolution.textContent = algToChinese(record.solution || "-");
   prevNote.textContent = record.note || "-";
 
   if (record.colors && record.colors.length > 0) {
