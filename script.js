@@ -60,7 +60,7 @@ const prevCanvas = document.getElementById("prevCanvas");
 const noImageText = document.getElementById("noImageText");
 
 const timerDisplay = document.getElementById("timerDisplay");
-
+const timerBox = document.getElementById("timerBox");
 const prevTime = document.getElementById("prevTime");
 const prevDepth = document.getElementById("prevDepth");
 const prevCase = document.getElementById("prevCase");
@@ -889,41 +889,46 @@ document.addEventListener("keyup", function(event) {
 // ===============================
 let touchStarted = false;
 
-document.addEventListener("touchstart", function(event) {
-  if (isTypingInput()) {
+timerBox.addEventListener("touchstart", function(event) {
+  if (
+    event.target.closest(
+      "button, input, select, textarea, label, .mobile-setting-button, .mobile-overlay"
+    )
+  ) {
     return;
   }
 
-  // 避免點按按鈕、checkbox、radio 時也觸發計時
-  if (event.target.closest("button, input, select, textarea, label")) {
-    return;
-  }
+  const touch = event.touches[0];
 
-  event.preventDefault();
-
-  // 防止多指觸控或連續觸發
-  if (touchStarted) return;
-
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  touchMoved = false;
   touchStarted = true;
-  handlePressStart();
-}, { passive: false });
 
-document.addEventListener("touchend", function(event) {
-  if (isTypingInput()) {
+  handlePressStart();
+}, { passive: true });
+
+
+timerBox.addEventListener("touchend", function(event) {
+  if (
+    event.target.closest(
+      "button, input, select, textarea, label, .mobile-setting-button, .mobile-overlay"
+    )
+  ) {
     return;
   }
 
   if (!touchStarted) return;
 
-  event.preventDefault();
-
   touchStarted = false;
+
+  if (touchMoved) {
+    touchMoved = false;
+    return;
+  }
+
   handlePressEnd();
-}, { passive: false });
-
-document.addEventListener("touchcancel", function() {
-  touchStarted = false;
-});
+}, { passive: true });
 
 // ===============================
 // 頁面載入
@@ -954,3 +959,34 @@ window.addEventListener("DOMContentLoaded", async () => {
     hideCurrentImage();
   }
 });
+
+// ===============================
+// 手機版設定面板
+// ===============================
+const mobileSettingButton = document.getElementById("mobileSettingButton");
+const mobileOverlay = document.getElementById("mobileOverlay");
+const settingPanel = document.querySelector(".app > .panel:first-child");
+
+function openMobileSetting() {
+  settingPanel.classList.add("show-setting");
+  mobileOverlay.classList.add("show");
+}
+
+function closeMobileSetting() {
+  settingPanel.classList.remove("show-setting");
+  mobileOverlay.classList.remove("show");
+}
+
+if (mobileSettingButton && mobileOverlay && settingPanel) {
+  mobileSettingButton.addEventListener("click", function(event) {
+    event.stopPropagation();
+
+    if (settingPanel.classList.contains("show-setting")) {
+      closeMobileSetting();
+    } else {
+      openMobileSetting();
+    }
+  });
+
+  mobileOverlay.addEventListener("click", closeMobileSetting);
+}

@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skewb Trainer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -35,32 +36,12 @@
           5-step
         </label>
         <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom1">
-          內建題組1
+          <input type="checkbox" class="depth-check" value="half_adj">
+          題組：半中心(鄰)
         </label>
         <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom2">
-          內建題組2
-        </label>
-        <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom3">
-          內建題組3
-        </label>
-        <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom4">
-          內建題組4
-        </label>
-        <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom5">
-          內建題組5
-        </label>
-        <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom6">
-          內建題組6
-        </label>
-        <label class="check-row">
-          <input type="checkbox" class="depth-check" value="custom7">
-          內建題組7
+          <input type="checkbox" class="depth-check" value="half_opp">
+          題組：半中心(對)
         </label>
 
       </div>
@@ -139,12 +120,17 @@
     </div>
 
     <!-- 中間訓練區 -->
-    <div class="panel center-panel">
+    <div class="panel center-panel" id="timerBox">
 
 
       <div class="scramble" id="scrambleText">
         尚未載入 scramble
       </div>
+
+        <!-- 手機版設定按鈕 -->
+      <button id="mobileSettingButton" class="mobile-setting-button">
+        ☰
+      </button>
 
       <div class="timer stopped" id="timerDisplay">0.00</div>
 
@@ -216,6 +202,7 @@
     </div>
 
   </div>
+  <div id="mobileOverlay" class="mobile-overlay"></div>
 
   <script src="script.js"></script>
 </body>
