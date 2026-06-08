@@ -435,6 +435,22 @@ async function loadSelectedDatasets() {
 // ===============================
 // 題目控制
 // ===============================
+function algToChinese(alg) {
+  const map = {
+    "r'": "下",
+    "r": "上",
+    "R'": "右",
+    "R": "左",
+    "B'": "推",
+    "B": "勾"
+  };
+
+  return String(alg)
+    .trim()
+    .split(/\s+/)
+    .map(move => map[move] || move)
+    .join(" ");
+}
 function nextCase() {
   if (timerState === "running") {
     if (!confirm("目前正在計時，確定要跳到下一題嗎？")) {
@@ -475,6 +491,7 @@ function nextCase() {
 
   caseTitle.textContent = `${formatCategoryLabel(currentCase)}｜${currentCase.name}`;
   scrambleText.textContent = currentCase.scramble || "-";
+  //scrambleText.textContent = algToChinese(currentCase.scramble || "-");
 
   showCurrentSkewb(currentCase.colors);
 }
@@ -599,6 +616,8 @@ function updatePrevious(record) {
   prevCase.textContent = record.caseName || "-";
   prevScramble.textContent = record.scramble || "-";
   prevSolution.textContent = record.solution || "-";
+  //prevScramble.textContent = algToChinese(record.scramble || "-");
+  //prevSolution.textContent = algToChinese(record.solution || "-");
   prevNote.textContent = record.note || "-";
 
   if (record.colors && record.colors.length > 0) {
@@ -798,6 +817,38 @@ function loadStarsFromStorage() {
 // ===============================
 // 鍵盤控制
 // ===============================
+// ===============================
+// 共用控制：空白鍵 / 觸控 都用這一套
+// ===============================
+function handlePressStart() {
+  if (isTypingInput()) {
+    return;
+  }
+
+  if (timerState === "idle") {
+    prepareTimer();
+    return;
+  }
+
+  if (timerState === "running") {
+    stopTimer();
+    return;
+  }
+}
+
+function handlePressEnd() {
+  if (isTypingInput()) {
+    return;
+  }
+
+  if (timerState === "ready") {
+    startTimer();
+  }
+}
+
+// ===============================
+// 鍵盤控制
+// ===============================
 document.addEventListener("keydown", function(event) {
   if (isTypingInput()) {
     return;
@@ -809,15 +860,8 @@ document.addEventListener("keydown", function(event) {
     // 防止長按空白鍵一直觸發
     if (event.repeat) return;
 
-    if (timerState === "idle") {
-      prepareTimer();
-      return;
-    }
-
-    if (timerState === "running") {
-      stopTimer();
-      return;
-    }
+    handlePressStart();
+    return;
   }
 
   if (event.key.toLowerCase() === "n") {
@@ -837,10 +881,48 @@ document.addEventListener("keyup", function(event) {
   if (event.code === "Space") {
     event.preventDefault();
 
-    if (timerState === "ready") {
-      startTimer();
-    }
+    handlePressEnd();
   }
+});
+// ===============================
+// 手機觸控控制
+// ===============================
+let touchStarted = false;
+
+document.addEventListener("touchstart", function(event) {
+  if (isTypingInput()) {
+    return;
+  }
+
+  // 避免點按按鈕、checkbox、radio 時也觸發計時
+  if (event.target.closest("button, input, select, textarea, label")) {
+    return;
+  }
+
+  event.preventDefault();
+
+  // 防止多指觸控或連續觸發
+  if (touchStarted) return;
+
+  touchStarted = true;
+  handlePressStart();
+}, { passive: false });
+
+document.addEventListener("touchend", function(event) {
+  if (isTypingInput()) {
+    return;
+  }
+
+  if (!touchStarted) return;
+
+  event.preventDefault();
+
+  touchStarted = false;
+  handlePressEnd();
+}, { passive: false });
+
+document.addEventListener("touchcancel", function() {
+  touchStarted = false;
 });
 
 // ===============================
