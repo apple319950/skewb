@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skewb Trainer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -15,6 +16,7 @@
       <h2>選擇分類</h2>
 
       <div class="checkbox-group category-grid">
+
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="2step">
           2-step
@@ -31,36 +33,48 @@
         </label>
 
         <label class="check-row">
-          <input type="checkbox" class="depth-check" value="5step">
-          5-step
-        </label>
-        <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom1">
-          彥腧1
+          彥腧要變強1
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom2">
-          彥腧2
+          彥腧要變強2
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom3">
-          彥腧3
+          彥腧要變強3
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom4">
-          彥腧4
+          彥腧要變強4
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom5">
-          彥腧5
+          彥腧要變強5
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom6">
-          彥腧6
+          彥腧要變強6
         </label>
         <label class="check-row">
           <input type="checkbox" class="depth-check" value="custom7">
-          彥腧7
+          彥腧變超強7
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom8">
+          彥腧要變強8
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom9">
+          彥腧要變強9
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom10">
+          彥腧要變強10
+        </label>
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="custom11">
+          彥腧變NR11
         </label>
 
       </div>
@@ -139,12 +153,17 @@
     </div>
 
     <!-- 中間訓練區 -->
-    <div class="panel center-panel">
+    <div class="panel center-panel" id="timerBox">
 
 
       <div class="scramble" id="scrambleText">
         尚未載入 scramble
       </div>
+
+        <!-- 手機版設定按鈕 -->
+      <button id="mobileSettingButton" class="mobile-setting-button">
+        ☰
+      </button>
 
       <div class="timer stopped" id="timerDisplay">0.00</div>
 
@@ -216,7 +235,8 @@
     </div>
 
   </div>
+  <div id="mobileOverlay" class="mobile-overlay"></div>
 
-  <script src="script_yu.js"></script>
+  <script src="yu.js"></script>
 </body>
 </html>
