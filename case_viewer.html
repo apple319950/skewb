@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skewb Case Viewer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: #f4f6f9;
+      color: #111827;
+    }
+
+    .app {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: 32px;
+    }
+
+    h2 {
+      margin: 18px 0 10px;
+      font-size: 20px;
+    }
+
+    .hint {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .dataset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .dataset-btn {
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .dataset-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .dataset-btn.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 12px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: #111827;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .secondary {
+      background: #4b5563;
+    }
+
+    .danger {
+      background: #b91c1c;
+    }
+
+    .star-filter-row {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat .num {
+      font-size: 26px;
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .stat .label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1050px;
+    }
+
+    thead {
+      background: #111827;
+      color: white;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .mono {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .star-button {
+      width: 42px;
+      height: 36px;
+      padding: 0;
+      border-radius: 10px;
+      background: #e5e7eb;
+      color: #6b7280;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .star-button.starred {
+      background: #facc15;
+      color: #78350f;
+    }
+
+    .case-canvas {
+      display: block;
+      width: 110px;
+      height: auto;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .no-colors {
+      color: #9ca3af;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .empty {
+      padding: 40px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .error-box {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fef2f2;
+      color: #991b1b;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid #fecaca;
+    }
+
+    .success-box {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      color: #065f46;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid #a7f3d0;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .panel {
+        padding: 16px;
+        border-radius: 14px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      h2 {
+        font-size: 17px;
+      }
+
+      .hint {
+        font-size: 13px;
+      }
+
+      .dataset-btn {
+        font-size: 13px;
+        padding: 8px 11px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions button {
+        width: 100%;
+      }
+
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat .num {
+        font-size: 22px;
+      }
+
+      th,
+      td {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+      .mono {
+        font-size: 13px;
+      }
+
+      .case-canvas {
+        width: 90px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+case_viewer.html
+    <div class="panel">
+      <h1>Skewb Case Viewer</h1>
+
+      <div class="hint">
+        此頁面會讀取 <b>dataset/manifest.json</b>，把每一組 JSON 題庫做成按鈕。<br>
+        按下的題庫才會組成表格，並且可以標記星星保存。
+      </div>
+
+      <h2>選擇題庫</h2>
+      <div id="datasetButtons" class="dataset-buttons">
+        載入中...
+      </div>
+
+      <div class="top-actions">
+        <button id="selectAllButton">全選題庫</button>
+        <button id="clearSelectionButton" class="secondary">取消選取</button>
+        <a href="layer_train.html">
+            <button id="reloadButton" class="secondary">重新訓練</button>
+        </a>
+        <button id="clearStarsButton" class="danger">清除所有星星</button>
+      </div>
+
+      <div class="controls">
+        <input id="searchInput" type="text" placeholder="搜尋 case / scramble / solution / note">
+
+        <select id="displayMode">
+          <option value="original">顯示原始公式</option>
+          <option value="chinese">顯示中文方向</option>
+          <option value="both">原始 + 中文</option>
+        </select>
+      </div>
+
+      <label class="star-filter-row">
+        <input id="starredOnlyCheck" type="checkbox">
+        只顯示星星題
+      </label>
+
+      <div id="successBox" class="success-box"></div>
+      <div id="errorBox" class="error-box"></div>
+
+      <div class="summary">
+        <div class="stat">
+          <div class="num" id="totalFiles">0</div>
+          <div class="label">manifest 檔案數</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="selectedFiles">0</div>
+          <div class="label">已選題庫</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="totalCases">0</div>
+          <div class="label">已載 Case</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="visibleCases">0</div>
+          <div class="label">目前顯示</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="starredCount">0</div>
+          <div class="label">星星題</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>星星</th>
+              <th>#</th>
+              <th>分類</th>
+              <th>圖</th>
+              <th>Case</th>
+              <th>Scramble</th>
+              <th>Solution</th>
+              <th>Note</th>
+              <th>來源檔案</th>
+            </tr>
+          </thead>
+          <tbody id="caseTableBody">
+            <tr>
+              <td colspan="9" class="empty">正在讀取 dataset/manifest.json...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const MANIFEST_PATH = "dataset/manifest.json";
+    const GEOMETRY_PATH = "skewb_geometry.json";
+    const STORAGE_STARS_KEY = "skewbTrainerStars";
+
+    let manifestFiles = [];
+    let selectedFilesSet = new Set();
+    let casesByFile = new Map();
+    let allSelectedCases = [];
+    let failedFiles = [];
+    let skewbGeometry = null;
+    let starredCases = new Set();
+
+    const datasetButtons = document.getElementById("datasetButtons");
+    const selectAllButton = document.getElementById("selectAllButton");
+    const clearSelectionButton = document.getElementById("clearSelectionButton");
+    const reloadButton = document.getElementById("reloadButton");
+    const clearStarsButton = document.getElementById("clearStarsButton");
+
+    const searchInput = document.getElementById("searchInput");
+    const displayMode = document.getElementById("displayMode");
+    const starredOnlyCheck = document.getElementById("starredOnlyCheck");
+
+    const totalFiles = document.getElementById("totalFiles");
+    const selectedFiles = document.getElementById("selectedFiles");
+    const totalCases = document.getElementById("totalCases");
+    const visibleCases = document.getElementById("visibleCases");
+    const starredCount = document.getElementById("starredCount");
+
+    const caseTableBody = document.getElementById("caseTableBody");
+    const successBox = document.getElementById("successBox");
+    const errorBox = document.getElementById("errorBox");
+
+    window.addEventListener("DOMContentLoaded", init);
+
+    selectAllButton.addEventListener("click", selectAllDatasets);
+    clearSelectionButton.addEventListener("click", clearSelection);
+    reloadButton.addEventListener("click", init);
+    clearStarsButton.addEventListener("click", clearAllStars);
+
+    searchInput.addEventListener("input", renderTable);
+    displayMode.addEventListener("change", renderTable);
+    starredOnlyCheck.addEventListener("change", renderTable);
+
+    async function init() {
+      hideError();
+      hideSuccess();
+
+      manifestFiles = [];
+      selectedFilesSet = new Set();
+      casesByFile = new Map();
+      allSelectedCases = [];
+      failedFiles = [];
+
+      loadStarsFromStorage();
+
+      datasetButtons.textContent = "載入中...";
+
+      caseTableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty">正在讀取 dataset/manifest.json...</td>
+        </tr>
+      `;
+
+      updateSummary();
+
+      try {
+        await loadSkewbGeometry();
+      } catch (error) {
+        console.warn("skewb_geometry.json 讀取失敗", error);
+        skewbGeometry = null;
+        showError("提醒：skewb_geometry.json 讀取失敗，所以表格內可能無法畫圖。");
+      }
+
+      try {
+        await loadManifest();
+        renderDatasetButtons();
+
+        caseTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">請選擇上方題庫按鈕</td>
+          </tr>
+        `;
+
+        showSuccess(`manifest 讀取完成，共找到 <b>${manifestFiles.length}</b> 個 JSON 題庫。`);
+
+      } catch (error) {
+        console.error(error);
+
+        datasetButtons.textContent = "manifest 讀取失敗";
+
+        caseTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">讀取 manifest.json 失敗</td>
+          </tr>
+        `;
+
+        showError(
+          `讀取 <b>${MANIFEST_PATH}</b> 失敗。<br><br>
+          請確認：<br>
+          1. dataset 資料夾裡有 manifest.json<br>
+          2. manifest.json 是正確 JSON 格式<br>
+          3. 不是用 file:/// 直接開啟，請用 Live Server 或 GitHub Pages<br><br>
+          錯誤訊息：${escapeHtml(error.message)}`
+        );
+      }
+    }
+
+    async function loadManifest() {
+      const response = await fetch(MANIFEST_PATH);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const fileList = await response.json();
+
+      if (!Array.isArray(fileList)) {
+        throw new Error("manifest.json 必須是陣列格式，例如：[\"2step.json\", \"3step.json\"]");
+      }
+
+      manifestFiles = fileList
+        .map(name => String(name).trim())
+        .filter(name => name.length > 0);
+    }
+
+    async function loadSkewbGeometry() {
+      const response = await fetch(GEOMETRY_PATH);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      skewbGeometry = await response.json();
+    }
+
+    function renderDatasetButtons() {
+      if (manifestFiles.length === 0) {
+        datasetButtons.innerHTML = "manifest.json 沒有任何檔案";
+        return;
+      }
+
+      datasetButtons.innerHTML = manifestFiles.map(fileName => {
+        const label = getCategoryFromFileName(fileName);
+
+        return `
+          <button class="dataset-btn" data-file="${escapeHtml(fileName)}">
+            ${escapeHtml(label)}
+          </button>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".dataset-btn").forEach(button => {
+        button.addEventListener("click", async () => {
+          const fileName = button.dataset.file;
+          await toggleDataset(fileName);
+        });
+      });
+
+      updateDatasetButtonState();
+      updateSummary();
+    }
+
+    async function toggleDataset(fileName) {
+      if (selectedFilesSet.has(fileName)) {
+        selectedFilesSet.delete(fileName);
+        rebuildSelectedCases();
+        updateDatasetButtonState();
+        renderTable();
+        return;
+      }
+
+      selectedFilesSet.add(fileName);
+
+      if (!casesByFile.has(fileName)) {
+        await loadSingleJsonFile(fileName);
+      }
+
+      rebuildSelectedCases();
+      updateDatasetButtonState();
+      renderTable();
+    }
+
+    async function selectAllDatasets() {
+      for (const fileName of manifestFiles) {
+        selectedFilesSet.add(fileName);
+
+        if (!casesByFile.has(fileName)) {
+          await loadSingleJsonFile(fileName);
+        }
+      }
+
+      rebuildSelectedCases();
+      updateDatasetButtonState();
+      renderTable();
+    }
+
+    function clearSelection() {
+      selectedFilesSet.clear();
+      rebuildSelectedCases();
+      updateDatasetButtonState();
+      renderTable();
+    }
+
+    async function loadSingleJsonFile(fileName) {
+      const cleanFileName = String(fileName).trim();
+
+      const jsonPath = cleanFileName.startsWith("dataset/")
+        ? cleanFileName
+        : `dataset/${cleanFileName}`;
+
+      try {
+        const response = await fetch(jsonPath);
+
+        if (!response.ok) {
+          failedFiles.push(`${jsonPath}，HTTP ${response.status}`);
+          casesByFile.set(cleanFileName, []);
+          showFailedFiles();
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          failedFiles.push(`${jsonPath}，不是陣列格式`);
+          casesByFile.set(cleanFileName, []);
+          showFailedFiles();
+          return;
+        }
+
+        const category = getCategoryFromFileName(cleanFileName);
+
+        const normalized = data
+        .map((item, index) => {
+            const depthFromCategory = parseDepthFromCategory(category);
+
+            return {
+            id: `${category}#${index + 1}`,
+            indexInFile: index + 1,
+            category: category,
+
+            // 要跟 train 的 depth 規則一致
+            depth: item.depth || depthFromCategory || category,
+
+            caseName: String(item.case || item.name || `${category} #${index + 1}`).trim(),
+            scramble: String(item.scramble || "").trim(),
+            solution: String(item.solution || "").trim(),
+            note: String(item.note || "").trim(),
+            colors: Array.isArray(item.colors) ? item.colors : [],
+            sourceFile: cleanFileName
+            };
+        })
+
+        casesByFile.set(cleanFileName, normalized);
+
+      } catch (error) {
+        console.error(`${jsonPath} 讀取失敗`, error);
+        failedFiles.push(`${jsonPath}，${error.message}`);
+        casesByFile.set(cleanFileName, []);
+        showFailedFiles();
+      }
+    }
+
+    function rebuildSelectedCases() {
+      allSelectedCases = [];
+
+      for (const fileName of selectedFilesSet) {
+        const cases = casesByFile.get(fileName) || [];
+        allSelectedCases.push(...cases);
+      }
+
+      updateSummary();
+    }
+
+    function updateDatasetButtonState() {
+      document.querySelectorAll(".dataset-btn").forEach(button => {
+        const fileName = button.dataset.file;
+
+        if (selectedFilesSet.has(fileName)) {
+          button.classList.add("active");
+        } else {
+          button.classList.remove("active");
+        }
+      });
+    }
+
+    function getFilteredCases() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const onlyStarred = starredOnlyCheck.checked;
+
+      return allSelectedCases.filter(item => {
+        if (onlyStarred && !starredCases.has(getCaseKey(item))) {
+          return false;
+        }
+
+        if (!keyword) {
+          return true;
+        }
+
+        const text = [
+          item.category,
+          item.caseName,
+          item.scramble,
+          algToChinese(item.scramble),
+          item.solution,
+          algToChinese(item.solution),
+          item.note,
+          item.sourceFile
+        ].join(" ").toLowerCase();
+
+        return text.includes(keyword);
+      });
+    }
+
+    function renderTable() {
+      const filtered = getFilteredCases();
+      updateSummary();
+
+      if (selectedFilesSet.size === 0) {
+        caseTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">請選擇上方題庫按鈕</td>
+          </tr>
+        `;
+        return;
+      }
+
+      if (allSelectedCases.length === 0) {
+        caseTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">已選題庫中沒有資料，請確認 JSON 格式</td>
+          </tr>
+        `;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        caseTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">沒有符合條件的 Case</td>
+          </tr>
+        `;
+        return;
+      }
+
+      caseTableBody.innerHTML = filtered.map((item, index) => {
+        const key = getCaseKey(item);
+        const isStarred = starredCases.has(key);
+        const canvasId = `canvas_${index}`;
+
+        return `
+          <tr>
+            <td>
+              <button
+                class="star-button ${isStarred ? "starred" : ""}"
+                data-key="${escapeHtml(key)}"
+                title="標記星星"
+              >
+                ${isStarred ? "★" : "☆"}
+              </button>
+            </td>
+            <td>${index + 1}</td>
+            <td><span class="tag">${escapeHtml(item.category)}</span></td>
+            <td>
+              ${
+                item.colors && item.colors.length > 0
+                  ? `<canvas id="${canvasId}" class="case-canvas"></canvas>`
+                  : `<div class="no-colors">無圖</div>`
+              }
+            </td>
+            <td>${escapeHtml(item.caseName)}</td>
+            <td class="mono">${escapeHtml(formatAlg(item.scramble))}</td>
+            <td class="mono">${escapeHtml(formatAlg(item.solution))}</td>
+            <td>${escapeHtml(item.note || "-")}</td>
+            <td>${escapeHtml(item.sourceFile)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".star-button").forEach(button => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.key;
+          toggleStar(key);
+        });
+      });
+
+      filtered.forEach((item, index) => {
+        if (item.colors && item.colors.length > 0) {
+          const canvas = document.getElementById(`canvas_${index}`);
+          drawSkewbToCanvas(canvas, item.colors, 1.25);
+        }
+      });
+    }
+
+    function drawSkewbToCanvas(canvas, colors, scale = 1.25) {
+      if (!canvas || !skewbGeometry || !colors || colors.length === 0) {
+        return;
+      }
+
+      const baseWidth = skewbGeometry.width;
+      const baseHeight = skewbGeometry.height;
+
+      canvas.width = baseWidth * scale;
+      canvas.height = baseHeight * scale;
+
+      const ctx = canvas.getContext("2d");
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      skewbGeometry.polygons.forEach((poly, index) => {
+        const points = poly.points;
+        const color = colors[index] || "#CCCCCC";
+
+        if (!points || points.length === 0) return;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          points[0][0] * scale,
+          points[0][1] * scale
+        );
+
+        for (let i = 1; i < points.length; i++) {
+          ctx.lineTo(
+            points[i][0] * scale,
+            points[i][1] * scale
+          );
+        }
+
+        ctx.closePath();
+
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1.2 * scale;
+        ctx.stroke();
+      });
+    }
+
+    function getCaseKey(item) {
+        return [
+            item.depth || "",
+            item.scramble || "",
+            item.solution || ""
+        ].join("||");
+    }
+
+    function toggleStar(key) {
+      if (starredCases.has(key)) {
+        starredCases.delete(key);
+      } else {
+        starredCases.add(key);
+      }
+
+      saveStarsToStorage();
+      renderTable();
+    }
+
+    function saveStarsToStorage() {
+      localStorage.setItem(
+        STORAGE_STARS_KEY,
+        JSON.stringify(Array.from(starredCases))
+      );
+    }
+
+    function loadStarsFromStorage() {
+      const raw = localStorage.getItem(STORAGE_STARS_KEY);
+
+      if (!raw) {
+        starredCases = new Set();
+        return;
+      }
+
+      try {
+        starredCases = new Set(JSON.parse(raw) || []);
+      } catch {
+        starredCases = new Set();
+      }
+    }
+
+    function clearAllStars() {
+      if (!confirm("確定要清除所有星星標記嗎？")) {
+        return;
+      }
+
+      starredCases = new Set();
+      localStorage.removeItem(STORAGE_STARS_KEY);
+      renderTable();
+    }
+
+    function updateSummary() {
+      totalFiles.textContent = manifestFiles.length;
+      selectedFiles.textContent = selectedFilesSet.size;
+      totalCases.textContent = allSelectedCases.length;
+
+      const filtered = getFilteredCases();
+      visibleCases.textContent = filtered.length;
+
+      starredCount.textContent = starredCases.size;
+    }
+
+    function showFailedFiles() {
+      if (failedFiles.length === 0) {
+        hideError();
+        return;
+      }
+
+      showError(
+        `以下檔案讀取失敗或格式不正確：<br>` +
+        failedFiles.map(item => `・${escapeHtml(item)}`).join("<br>")
+      );
+    }
+
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.innerHTML = message;
+    }
+
+    function hideSuccess() {
+      successBox.style.display = "none";
+      successBox.innerHTML = "";
+    }
+
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.innerHTML = message;
+    }
+
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.innerHTML = "";
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function algToChinese(alg) {
+      const map = {
+        "r'": "下",
+        "r": "上",
+        "R'": "右",
+        "R": "左",
+        "B'": "推",
+        "B": "勾",
+        "L'": "左反",
+        "L": "左正",
+        "U'": "上反",
+        "U": "上正"
+      };
+
+      return String(alg || "")
+        .trim()
+        .split(/\s+/)
+        .map(move => map[move] || move)
+        .join(" ");
+    }
+
+    function formatAlg(alg) {
+      const mode = displayMode.value;
+      const original = String(alg || "").trim();
+      const chinese = algToChinese(original);
+
+      if (mode === "chinese") {
+        return chinese;
+      }
+
+      if (mode === "both") {
+        return `${original}\n${chinese}`;
+      }
+
+      return original;
+    }
+
+    function getCategoryFromFileName(fileName) {
+      return String(fileName)
+        .replace(/^.*\//, "")
+        .replace(/\.json$/i, "");
+    }
+    function parseDepthFromCategory(category) {
+        const match = String(category).match(/^(\d+)step$/);
+
+        if (!match) {
+            return null;
+        }
+
+        return Number(match[1]);
+    }
+  </script>
+</body>
+</html>

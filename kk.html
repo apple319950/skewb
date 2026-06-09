@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Skewb Trainer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      gap: 18px;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 5px 0;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      background: #111827;
+      color: white;
+    }
+
+    button:hover {
+      background: #374151;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.danger {
+      background: #b91c1c;
+    }
+
+    .checkbox-group {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .check-row input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .status {
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.7;
+    }
+
+    .small {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .center-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .case-title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      color: #374151;
+      min-height: 30px;
+    }
+
+    .case-image-box {
+      width: 100%;
+      min-height: 200px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .case-image-box img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      display: none;
+    }
+
+    .no-image {
+      color: #9ca3af;
+      font-size: 16px;
+    }
+
+    .scramble {
+      width: 100%;
+      background: #111827;
+      color: white;
+      border-radius: 16px;
+      padding: 20px;
+      font-size: 28px;
+      line-height: 1.35;
+      text-align: center;
+      min-height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      word-break: break-word;
+      font-family: Consolas, monospace;
+    }
+
+    .timer {
+      font-size: 90px;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-top: 4px;
+      color: #111827;
+      user-select: none;
+    }
+
+    .timer.ready {
+      color: #16a34a;
+    }
+
+    .timer.running {
+      color: #dc2626;
+    }
+
+    .timer.stopped {
+      color: #111827;
+    }
+
+    .shortcut {
+      text-align: center;
+      color: #6b7280;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat .num {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .stat .label {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .prev-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .prev-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .mono {
+      font-family: Consolas, monospace;
+      word-break: break-word;
+    }
+
+    .prev-image {
+      max-width: 100%;
+      max-height: 170px;
+      object-fit: contain;
+      display: none;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    .records {
+      max-height: 360px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f4f6;
+      position: sticky;
+      top: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .timer {
+        font-size: 64px;
+      }
+
+      .case-image-box {
+        min-height: 240px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- 左側設定 -->
+    <div class="panel">
+      <h2>選擇訓練步數</h2>
+
+      <div class="checkbox-group">
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="2" checked>
+          2-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="3" checked>
+          3-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="4">
+          4-step
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" class="depth-check" value="5">
+          5-step
+        </label>
+      </div>
+
+      <button onclick="loadSelectedDatasets()">重新載入題庫</button>
+      <button onclick="nextCase()">下一題</button>
+      <button class="secondary" onclick="resetTimer()">重置時間</button>
+      <button class="danger" onclick="clearRecords()">清除紀錄</button>
+
+      <div class="status">
+        狀態：<b id="timerStateText">尚未開始</b><br>
+        已讀取：<b id="caseCount">0</b> 題<br>
+        已選步數：<b id="selectedDepthText">-</b><br>
+        目前題號：<b id="currentIndexText">-</b>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="num" id="solveCount">0</div>
+          <div class="label">完成數</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="bestTime">-</div>
+          <div class="label">Best</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="avgTime">-</div>
+          <div class="label">Average</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="lastTime">-</div>
+          <div class="label">Last</div>
+        </div>
+      </div>
+
+      <p class="small">
+        請用 VS Code Live Server 開啟。<br><br>
+        HTML 要跟這些資料夾同一層：<br>
+        <code>skewb_2step_dataset/</code><br>
+        <code>skewb_3step_dataset/</code><br>
+        <code>skewb_4step_dataset/</code><br>
+        <code>skewb_5step_dataset/</code>
+      </p>
+    </div>
+
+    <!-- 中間訓練區 -->
+    <div class="panel center-panel">
+      <h1>Skewb Trainer</h1>
+      <div class="scramble" id="scrambleText">
+        尚未載入 scramble
+      </div>
+      <div class="timer stopped" id="timerDisplay">0.00</div>
+
+      <div class="shortcut">
+        空白鍵按住：準備<br>
+        空白鍵放開：開始<br>
+        再按一次空白鍵：停止並記錄<br>
+        N：下一題　R：重置
+      </div>
+      <div class="case-title" id="caseTitle">正在載入題庫...</div>
+
+      <div class="case-image-box">
+        <span class="no-image" id="noImageText">尚未載入圖片</span>
+        <img id="caseImage" src="" alt="case image" />
+      </div>
+    </div>
+
+    <!-- 右側上一題與紀錄 -->
+    <div class="panel">
+      <h2>上一題</h2>
+
+      <div class="prev-box">
+        <div class="prev-title">時間</div>
+        <div id="prevTime">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">步數</div>
+        <div id="prevDepth">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">Case</div>
+        <div id="prevCase">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">圖片</div>
+        <div id="prevImageText">-</div>
+        <img id="prevImage" class="prev-image" src="" alt="previous case image" />
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">Scramble</div>
+        <div id="prevScramble" class="mono">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">Solution</div>
+        <div id="prevSolution" class="mono">-</div>
+      </div>
+
+      <div class="prev-box">
+        <div class="prev-title">Note</div>
+        <div id="prevNote">-</div>
+      </div>
+
+      <h2>紀錄</h2>
+
+      <div class="records">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Time</th>
+              <th>Step</th>
+              <th>Case</th>
+            </tr>
+          </thead>
+          <tbody id="recordBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ===============================
+    // 全域資料
+    // ===============================
+    let cases = [];
+    let currentCase = null;
+    let currentIndex = -1;
+    let records = [];
+
+    // idle    = 還沒開始
+    // ready   = 空白鍵按住，準備開始
+    // running = 計時中
+    let timerState = "idle";
+
+    let startTime = 0;
+    let elapsedTime = 0;
+    let timerInterval = null;
+
+    // ===============================
+    // DOM
+    // ===============================
+    const depthChecks = document.querySelectorAll(".depth-check");
+
+    const caseCount = document.getElementById("caseCount");
+    const selectedDepthText = document.getElementById("selectedDepthText");
+    const currentIndexText = document.getElementById("currentIndexText");
+    const timerStateText = document.getElementById("timerStateText");
+
+    const caseTitle = document.getElementById("caseTitle");
+    const scrambleText = document.getElementById("scrambleText");
+    const caseImage = document.getElementById("caseImage");
+    const noImageText = document.getElementById("noImageText");
+
+    const timerDisplay = document.getElementById("timerDisplay");
+
+    const prevTime = document.getElementById("prevTime");
+    const prevDepth = document.getElementById("prevDepth");
+    const prevCase = document.getElementById("prevCase");
+    const prevScramble = document.getElementById("prevScramble");
+    const prevSolution = document.getElementById("prevSolution");
+    const prevNote = document.getElementById("prevNote");
+    const prevImage = document.getElementById("prevImage");
+    const prevImageText = document.getElementById("prevImageText");
+
+    const solveCount = document.getElementById("solveCount");
+    const bestTime = document.getElementById("bestTime");
+    const avgTime = document.getElementById("avgTime");
+    const lastTime = document.getElementById("lastTime");
+    const recordBody = document.getElementById("recordBody");
+
+    // ===============================
+    // 取得已勾選步數
+    // ===============================
+    function getSelectedDepths() {
+      return Array.from(depthChecks)
+        .filter(check => check.checked)
+        .map(check => check.value);
+    }
+
+    // ===============================
+    // 讀取多個 dataset
+    // ===============================
+    async function loadSelectedDatasets() {
+      const selectedDepths = getSelectedDepths();
+
+      selectedDepthText.textContent = selectedDepths.length > 0
+        ? selectedDepths.map(d => `${d}-step`).join(", ")
+        : "-";
+
+      if (selectedDepths.length === 0) {
+        cases = [];
+        caseCount.textContent = "0";
+        caseTitle.textContent = "請至少選擇一個步數";
+        scrambleText.textContent = "尚未載入題庫";
+        hideCurrentImage();
+        return;
+      }
+
+      caseTitle.textContent = "正在載入題庫...";
+      scrambleText.textContent = selectedDepths.map(d => `skewb_${d}step_dataset/cases.json`).join(" / ");
+      hideCurrentImage();
+
+      const allCases = [];
+
+      for (const depth of selectedDepths) {
+        const datasetDir = `skewb_${depth}step_dataset`;
+        const jsonPath = `${datasetDir}/cases.json`;
+
+        try {
+          const response = await fetch(jsonPath);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          const normalized = data
+            .map((item, index) => {
+              const rawImage = String(item.image || "").trim();
+
+              return {
+                scramble: String(item.scramble || "").trim(),
+                name: String(item.case || item.name || `Skewb ${depth}-step #${index + 1}`).trim(),
+                solution: String(item.solution || "").trim(),
+                note: String(item.note || "").trim(),
+
+                // 重要：
+                // JSON 裡通常是 images/skewb_001.png
+                // 但 HTML 在外層，所以要補上資料夾名稱
+                image: rawImage ? `${datasetDir}/${rawImage}` : "",
+
+                depth: Number(depth),
+                source: jsonPath
+              };
+            })
+            .filter(item => item.scramble.length > 0);
+
+          allCases.push(...normalized);
+
+          console.log(`${jsonPath} 載入完成：${normalized.length} 題`);
+
+        } catch (error) {
+          console.error(`讀取失敗：${jsonPath}`, error);
+          alert(`讀取失敗：${jsonPath}\n請確認資料夾與 cases.json 是否存在，並用 Live Server 開啟。`);
+        }
+      }
+
+      cases = allCases;
+      caseCount.textContent = cases.length;
+
+      clearRecords();
+
+      if (cases.length === 0) {
+        caseTitle.textContent = "沒有成功載入任何題目";
+        scrambleText.textContent = "請確認 cases.json 格式";
+        hideCurrentImage();
+        return;
+      }
+
+      nextCase();
+    }
+
+    // 勾選變更後自動重新載入
+    depthChecks.forEach(check => {
+      check.addEventListener("change", loadSelectedDatasets);
+    });
+
+    // ===============================
+    // 題目控制
+    // ===============================
+    function nextCase() {
+      if (cases.length === 0) {
+        alert("尚未載入題庫");
+        return;
+      }
+
+      resetTimer();
+
+      currentIndex = Math.floor(Math.random() * cases.length);
+      currentCase = cases[currentIndex];
+
+      currentIndexText.textContent = currentIndex + 1;
+
+      caseTitle.textContent = `${currentCase.depth}-step｜${currentCase.name}`;
+      scrambleText.textContent = currentCase.scramble || "-";
+
+      showCurrentImage(currentCase.image);
+    }
+
+    function showCurrentImage(imagePath) {
+      if (imagePath) {
+        caseImage.src = imagePath;
+        caseImage.style.display = "block";
+        noImageText.style.display = "none";
+      } else {
+        hideCurrentImage();
+      }
+    }
+
+    function hideCurrentImage() {
+      caseImage.src = "";
+      caseImage.style.display = "none";
+      noImageText.style.display = "block";
+      noImageText.textContent = "此題沒有圖片";
+    }
+
+    // ===============================
+    // Timer
+    // ===============================
+    function setTimerState(newState) {
+      timerState = newState;
+
+      timerDisplay.classList.remove("ready", "running", "stopped");
+
+      if (newState === "idle") {
+        timerStateText.textContent = "待機";
+        timerDisplay.classList.add("stopped");
+      }
+
+      if (newState === "ready") {
+        timerStateText.textContent = "準備中，放開空白鍵開始";
+        timerDisplay.classList.add("ready");
+      }
+
+      if (newState === "running") {
+        timerStateText.textContent = "計時中";
+        timerDisplay.classList.add("running");
+      }
+    }
+
+    function prepareTimer() {
+      if (!currentCase) {
+        alert("請先載入題庫");
+        return;
+      }
+
+      if (timerState !== "idle") return;
+
+      setTimerState("ready");
+      timerDisplay.textContent = "0.00";
+      elapsedTime = 0;
+    }
+
+    function startTimer() {
+      if (!currentCase) return;
+      if (timerState !== "ready") return;
+
+      elapsedTime = 0;
+      startTime = Date.now();
+
+      setTimerState("running");
+
+      clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        elapsedTime = Date.now() - startTime;
+        timerDisplay.textContent = formatTime(elapsedTime);
+      }, 10);
+    }
+
+    function stopTimer() {
+      if (timerState !== "running") return;
+
+      clearInterval(timerInterval);
+      elapsedTime = Date.now() - startTime;
+
+      const timeText = formatTime(elapsedTime);
+      const timeNumber = elapsedTime / 1000;
+
+      const record = {
+        timeText,
+        timeNumber,
+        depth: currentCase.depth,
+        caseName: currentCase.name || `Case ${currentIndex + 1}`,
+        scramble: currentCase.scramble,
+        solution: currentCase.solution,
+        note: currentCase.note,
+        image: currentCase.image
+      };
+
+      records.push(record);
+
+      updatePrevious(record);
+      updateStats();
+      renderRecords();
+
+      setTimerState("idle");
+      nextCase();
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+
+      elapsedTime = 0;
+      startTime = 0;
+      timerDisplay.textContent = "0.00";
+
+      setTimerState("idle");
+    }
+
+    function formatTime(ms) {
+      return (ms / 1000).toFixed(2);
+    }
+
+    // ===============================
+    // 紀錄與統計
+    // ===============================
+    function updatePrevious(record) {
+      prevTime.textContent = record.timeText;
+      prevDepth.textContent = `${record.depth}-step`;
+      prevCase.textContent = record.caseName || "-";
+      prevScramble.textContent = record.scramble || "-";
+      prevSolution.textContent = record.solution || "-";
+      prevNote.textContent = record.note || "-";
+
+      if (record.image) {
+        prevImage.src = record.image;
+        prevImage.style.display = "block";
+        prevImageText.textContent = record.image;
+      } else {
+        prevImage.src = "";
+        prevImage.style.display = "none";
+        prevImageText.textContent = "-";
+      }
+    }
+
+    function updateStats() {
+      solveCount.textContent = records.length;
+
+      if (records.length === 0) {
+        bestTime.textContent = "-";
+        avgTime.textContent = "-";
+        lastTime.textContent = "-";
+        return;
+      }
+
+      const times = records.map(r => r.timeNumber);
+      const best = Math.min(...times);
+      const avg = times.reduce((a, b) => a + b, 0) / times.length;
+      const last = records[records.length - 1].timeNumber;
+
+      bestTime.textContent = best.toFixed(2);
+      avgTime.textContent = avg.toFixed(2);
+      lastTime.textContent = last.toFixed(2);
+    }
+
+    function renderRecords() {
+      recordBody.innerHTML = "";
+
+      records.slice().reverse().forEach((record, reverseIndex) => {
+        const originalIndex = records.length - reverseIndex;
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${originalIndex}</td>
+          <td>${record.timeText}</td>
+          <td>${record.depth}-step</td>
+          <td>${escapeHtml(record.caseName)}</td>
+        `;
+
+        recordBody.appendChild(tr);
+      });
+    }
+
+    function clearRecords() {
+      records = [];
+
+      prevTime.textContent = "-";
+      prevDepth.textContent = "-";
+      prevCase.textContent = "-";
+      prevScramble.textContent = "-";
+      prevSolution.textContent = "-";
+      prevNote.textContent = "-";
+
+      prevImage.src = "";
+      prevImage.style.display = "none";
+      prevImageText.textContent = "-";
+
+      recordBody.innerHTML = "";
+      updateStats();
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // ===============================
+    // 鍵盤控制
+    // ===============================
+    document.addEventListener("keydown", function(event) {
+      const tag = document.activeElement.tagName.toLowerCase();
+
+      if (
+        tag === "input" ||
+        tag === "textarea" ||
+        tag === "select"
+      ) {
+        return;
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+
+        // 防止長按空白鍵一直觸發
+        if (event.repeat) return;
+
+        if (timerState === "idle") {
+          prepareTimer();
+          return;
+        }
+
+        if (timerState === "running") {
+          stopTimer();
+          return;
+        }
+      }
+
+      if (event.key.toLowerCase() === "n") {
+        nextCase();
+      }
+
+      if (event.key.toLowerCase() === "r") {
+        resetTimer();
+      }
+    });
+
+    document.addEventListener("keyup", function(event) {
+      const tag = document.activeElement.tagName.toLowerCase();
+
+      if (
+        tag === "input" ||
+        tag === "textarea" ||
+        tag === "select"
+      ) {
+        return;
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+
+        if (timerState === "ready") {
+          startTimer();
+        }
+      }
+    });
+
+    // ===============================
+    // 頁面載入後自動讀取預設勾選的題庫
+    // ===============================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadSelectedDatasets();
+    });
+  </script>
+</body>
+</html>

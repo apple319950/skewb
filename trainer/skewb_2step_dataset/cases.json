@@ -1,0 +1,86 @@
+[
+  {
+    "scramble": "R' r'",
+    "case": "Skewb 2-step #001",
+    "solution": "r R",
+    "note": "",
+    "image": "images/skewb_001.png"
+  },
+  {
+    "scramble": "R r'",
+    "case": "Skewb 2-step #002",
+    "solution": "r R'",
+    "note": "",
+    "image": "images/skewb_002.png"
+  },
+  {
+    "scramble": "b' r'",
+    "case": "Skewb 2-step #003",
+    "solution": "r b",
+    "note": "",
+    "image": "images/skewb_003.png"
+  },
+  {
+    "scramble": "b r'",
+    "case": "Skewb 2-step #004",
+    "solution": "r b'",
+    "note": "",
+    "image": "images/skewb_004.png"
+  },
+  {
+    "scramble": "B' r'",
+    "case": "Skewb 2-step #005",
+    "solution": "r B",
+    "note": "",
+    "image": "images/skewb_005.png"
+  },
+  {
+    "scramble": "B r'",
+    "case": "Skewb 2-step #006",
+    "solution": "r B'",
+    "note": "",
+    "image": "images/skewb_006.png"
+  },
+  {
+    "scramble": "R' r",
+    "case": "Skewb 2-step #007",
+    "solution": "r' R",
+    "note": "",
+    "image": "images/skewb_007.png"
+  },
+  {
+    "scramble": "R r",
+    "case": "Skewb 2-step #008",
+    "solution": "r' R'",
+    "note": "",
+    "image": "images/skewb_008.png"
+  },
+  {
+    "scramble": "b' r",
+    "case": "Skewb 2-step #009",
+    "solution": "r' b",
+    "note": "",
+    "image": "images/skewb_009.png"
+  },
+  {
+    "scramble": "b r",
+    "case": "Skewb 2-step #010",
+    "solution": "r' b'",
+    "note": "",
+    "image": "images/skewb_010.png"
+  },
+  {
+    "scramble": "B' r",
+    "case": "Skewb 2-step #011",
+    "solution": "r' B",
+    "note": "",
+    "image": "images/skewb_011.png"
+  },
+  {
+    "scramble": "B r",
+    "case": "Skewb 2-step #012",
+    "solution": "r' B'",
+    "note": "",
+    "image": "images/skewb_012.png"
+  }
+]
